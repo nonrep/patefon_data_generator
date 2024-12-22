@@ -4,22 +4,20 @@ import random
 import time
 import uuid
 
-# Импортируйте параметры подключения из вашего файла конфигурации
 from config import host, user, password, db_name, port
 
-# Указание порта для подключения
 fake = Faker('ru_RU')
 
 def generate_users(n):
     users = []
-    usernames = set()  # Для хранения уникальных юзернеймов
+    usernames = set()
 
     while len(users) < n:
         username = fake.user_name()
         
-        # Проверяем, уникален ли username
+        # Проверка на уникальность
         if username not in usernames:
-            usernames.add(username)  # Добавляем новый username в множество
+            usernames.add(username)
             
             users.append(
                 (
@@ -43,7 +41,7 @@ def generate_chats(n):
             (
                 str(uuid.uuid4()),
                 fake.company(),
-                2,  # Важно указать верные значения для chat_type_id
+                2,
                 fake.image_url(),
             )
         )
@@ -56,15 +54,14 @@ def generate_messages(n, user_ids, chat_id):
             (
                 str(uuid.uuid4()),
                 chat_id,
-                random.choice(user_ids),  # Случайный пользователь из списка
+                random.choice(user_ids),
                 fake.text(max_nb_chars=200),
                 fake.date_time_this_decade().isoformat(),
-                random.choice([True, False])  # is_redacted
+                random.choice([True, False])
             )
         )
     return messages
 
-# Главное тело программы
 start_time = time.time()
 
 # 1x users
@@ -102,7 +99,7 @@ try:
 
         # Генерация чатов
         print('[INFO] генерация чатов')
-        chat_data = generate_chats(2 * dataMultiplier)  # Сгенерировать 100,000 чатов
+        chat_data = generate_chats(2 * dataMultiplier)
         cursor.executemany("""
             INSERT INTO public.chat (id, chat_name, chat_type_id, avatar_path) 
             VALUES (%s, %s, %s, %s)
